@@ -1,0 +1,45 @@
+COMO LIGAR O SISTEMA AO SUPABASE
+================================
+
+PASSO 1 - Criar o projeto (grátis)
+  1. Entre em https://supabase.com e clique em "Start your project". Pode entrar com a conta do Google ou do GitHub.
+  2. Clique em "New project".
+  3. Dê um nome (ex.: cadastro-clientes), crie uma senha para o banco (guarde-a) e escolha a região "South America (São Paulo)".
+  4. Clique em "Create new project" e espere uns 2 minutos.
+
+PASSO 2 - Criar a tabela
+  1. No menu da esquerda, abra "SQL Editor" e clique em "New query".
+  2. Abra o arquivo supabase-setup.sql (desta pasta) no Bloco de Notas, copie TUDO e cole lá.
+  3. Clique em "Run". Deve aparecer "Success. No rows returned".
+
+PASSO 3 - Colocar as chaves no site
+  1. No Supabase, abra "Project Settings" > "API" (ou o botão "Connect" no topo).
+  2. Copie o "Project URL" e a chave "anon public".
+  3. Abra o arquivo config.js desta pasta no Bloco de Notas e cole cada um no lugar indicado, entre as aspas.
+  4. Salve o arquivo.
+  ATENÇÃO: nunca use a chave "service_role" no site.
+
+PASSO 4 - Confirmação de e-mail (escolha uma opção)
+  Por padrão, o Supabase manda um e-mail de confirmação para cada conta nova.
+  a) Mais simples: em "Authentication" > "Sign In / Providers" > "Email", desligue "Confirm email".
+     A conta já entra direto depois do cadastro.
+  b) Mais seguro: deixe ligado. Depois de publicar o site (passo 5), vá em
+     "Authentication" > "URL Configuration" e coloque o endereço do site em "Site URL".
+     Assim o link do e-mail leva de volta para o seu site.
+
+PASSO 5 - Acessar de qualquer lugar (publicar o site)
+  Com o Supabase ligado, os dados já ficam na nuvem. Mas, para abrir o SITE em qualquer
+  computador ou celular, ele precisa estar publicado na internet. Jeito mais fácil (grátis):
+  1. Entre em https://app.netlify.com/drop (crie uma conta grátis se pedir).
+  2. Arraste a pasta "SISTEMA CADASTRO" inteira para a página.
+  3. Ele gera um endereço tipo https://nome-qualquer.netlify.app. É só abrir esse link
+     de qualquer lugar e fazer login.
+  Sempre que mudar algum arquivo, arraste a pasta de novo em "Deploys" no Netlify.
+
+DADOS ANTIGOS
+  Se você já tinha cadastrado clientes na versão anterior (salva só no navegador), ao entrar
+  no painel neste mesmo navegador aparece um aviso perguntando se quer importar para o Supabase.
+
+SEGURANÇA
+  - Cada conta só vê os próprios clientes (regras criadas pelo supabase-setup.sql).
+  - Os dados ficam no Supabase. Para ver ou fazer backup: menu "Table Editor" > tabela "clientes".

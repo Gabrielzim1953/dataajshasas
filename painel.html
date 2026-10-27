@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clientes | Cadastro de Clientes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="lateral" id="lateral">
+    <a class="logo" href="painel.html">
+      <span class="logo-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+      Cadastro
+    </a>
+    <nav class="menu">
+      <a href="painel.html" class="ativo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</a>
+      <a href="#" id="menu-novo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo cadastro</a>
+      <a href="#" id="menu-exportar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exportar planilha</a>
+    </nav>
+    <div class="usuario">
+      <div class="avatar" id="u-avatar"></div>
+      <div><strong id="u-nome"></strong><span id="u-email"></span></div>
+      <button class="btn-sair" id="sair" title="Sair" aria-label="Sair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+  </aside>
+
+  <main class="conteudo">
+    <div class="topo">
+      <div style="display:flex;gap:14px;align-items:center">
+        <button class="btn-menu" id="abrir-menu" aria-label="Abrir menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div>
+          <h1>Clientes</h1>
+          <p id="saudacao"></p>
+        </div>
+      </div>
+      <div class="topo-acoes">
+        <button class="btn btn-secundaria" id="exportar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exportar</button>
+        <button class="btn btn-primaria" id="novo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo cadastro</button>
+      </div>
+    </div>
+
+    <div class="alerta ok" id="importar-aviso" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+        <span>Encontramos <strong id="importar-qtd"></strong> cadastro(s) salvos neste navegador pela versão antiga do sistema. Quer enviar para o Supabase?</span>
+        <span style="display:flex;gap:8px">
+          <button class="btn btn-secundaria" id="importar-depois" style="height:38px">Agora não</button>
+          <button class="btn btn-primaria" id="importar-sim" style="height:38px">Importar</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="estatisticas">
+      <div class="estat">
+        <div class="estat-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div>
+        <div><span>Total de cadastros</span><strong id="e-total">0</strong></div>
+      </div>
+      <div class="estat">
+        <div class="estat-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div><span>Cadastrados este mês</span><strong id="e-mes">0</strong></div>
+      </div>
+      <div class="estat">
+        <div class="estat-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div><span>Último cadastro</span><strong id="e-ultimo" style="font-size:18px">—</strong></div>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-topo">
+        <div class="busca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="busca" type="search" placeholder="Buscar por nome, CPF, telefone ou cidade">
+        </div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <label class="check" style="font-size:14px"><input type="checkbox" id="mostrar-cpf"> Mostrar CPF completo</label>
+          <span class="contagem" id="contagem"></span>
+        </div>
+      </div>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-ordem="nome">Nome <span class="seta">↕</span></th>
+              <th>CPF</th>
+              <th>Telefone</th>
+              <th data-ordem="cidade">Cidade <span class="seta">↕</span></th>
+              <th data-ordem="criado_em">Cadastrado em <span class="seta">↕</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="linhas"></tbody>
+        </table>
+      </div>
+      <div class="vazio" id="vazio" hidden></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: novo / editar -->
+<div class="modal-fundo" id="modal-form">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="form-titulo">
+    <form id="form" novalidate>
+      <div class="modal-cabeca">
+        <h2 id="form-titulo">Novo cadastro</h2>
+        <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="modal-corpo">
+        <div class="alerta" id="form-alerta" style="margin-bottom:16px"></div>
+        <div class="grade">
+          <div class="secao-titulo">Dados pessoais</div>
+          <div class="campo c6"><label for="f-nome">Nome completo</label><input id="f-nome" autocomplete="off"><span class="msg-erro">Informe o nome completo.</span></div>
+          <div class="campo c3"><label for="f-cpf">CPF</label><input id="f-cpf" inputmode="numeric" placeholder="000.000.000-00"><span class="msg-erro">CPF inválido.</span></div>
+          <div class="campo c3"><label for="f-nascimento">Data de nascimento <span class="opcional">(opcional)</span></label><input id="f-nascimento" type="date"><span class="msg-erro">Data inválida.</span></div>
+
+          <div class="secao-titulo">Contato</div>
+          <div class="campo c3"><label for="f-telefone">Telefone / WhatsApp</label><input id="f-telefone" inputmode="tel" placeholder="(00) 00000-0000"><span class="msg-erro">Telefone inválido.</span></div>
+          <div class="campo c3"><label for="f-email">E-mail <span class="opcional">(opcional)</span></label><input id="f-email" type="email" placeholder="cliente@email.com"><span class="msg-erro">E-mail inválido.</span></div>
+
+          <div class="secao-titulo">Endereço <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional)</span></div>
+          <div class="campo c2"><label for="f-cep">CEP</label><input id="f-cep" inputmode="numeric" placeholder="00000-000"><span class="msg-erro">CEP não encontrado.</span></div>
+          <div class="campo c4"><label for="f-rua">Rua</label><input id="f-rua"></div>
+          <div class="campo c2"><label for="f-numero">Número</label><input id="f-numero"></div>
+          <div class="campo c4"><label for="f-bairro">Bairro</label><input id="f-bairro"></div>
+          <div class="campo c4"><label for="f-cidade">Cidade</label><input id="f-cidade"></div>
+          <div class="campo c2"><label for="f-uf">UF</label><input id="f-uf" maxlength="2" style="text-transform:uppercase"></div>
+
+          <div class="campo c6"><label for="f-obs">Observações <span class="opcional">(opcional)</span></label><textarea id="f-obs"></textarea></div>
+        </div>
+      </div>
+      <div class="modal-rodape">
+        <button type="button" class="btn btn-secundaria" data-fechar>Cancelar</button>
+        <button type="submit" class="btn btn-primaria" id="salvar">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: ver detalhes -->
+<div class="modal-fundo" id="modal-ver">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ver-titulo">
+    <div class="modal-cabeca">
+      <h2 id="ver-titulo">Detalhes</h2>
+      <button type="button" class="btn-icone" data-fechar aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-corpo"><dl class="detalhe" id="ver-corpo"></dl></div>
+    <div class="modal-rodape">
+      <button type="button" class="btn btn-secundaria" data-fechar>Fechar</button>
+      <button type="button" class="btn btn-primaria" id="ver-editar">Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: confirmar exclusão -->
+<div class="modal-fundo" id="modal-excluir">
+  <div class="modal pequeno" role="alertdialog" aria-modal="true" aria-labelledby="excluir-titulo">
+    <div class="modal-corpo">
+      <h2 id="excluir-titulo" style="font-size:18px;margin-bottom:8px">Excluir cadastro?</h2>
+      <p style="color:var(--apagado)">O cadastro de <strong id="excluir-nome"></strong> será apagado. Isso não pode ser desfeito.</p>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn btn-secundaria" data-fechar>Cancelar</button>
+      <button type="button" class="btn btn-perigo" id="confirmar-excluir">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const USUARIO = await Auth.exigirLogin();
+  const $ = (id) => document.getElementById(id);
+  let registros = [];
+  let carregando = true;
+  let editandoId = null, excluindoId = null, vendoId = null;
+  let ordem = { campo: "criado_em", asc: false };
+
+  // ===== Usuário =====
+  $("u-avatar").textContent = iniciais(USUARIO.nome);
+  $("u-nome").textContent = USUARIO.nome;
+  $("u-email").textContent = USUARIO.email;
+  $("saudacao").textContent = "Olá, " + USUARIO.nome.split(" ")[0] + ". Gerencie seus cadastros aqui.";
+  $("sair").onclick = () => Auth.sair();
+  $("abrir-menu").onclick = (e) => { e.stopPropagation(); $("lateral").classList.toggle("aberta"); };
+  document.addEventListener("click", (e) => { if (!e.target.closest("#lateral")) $("lateral").classList.remove("aberta"); });
+
+  // ===== Formatação =====
+  const dataBR = (iso) => iso ? new Date(iso).toLocaleDateString("pt-BR") : "—";
+  const nascBR = (d) => d ? d.split("-").reverse().join("/") : "—";
+  const cpfOculto = (cpf) => "***." + cpf.slice(4, 11) + "-**";
+
+  // ===== Supabase =====
+  async function carregar() {
+    const { data, error } = await sb.from("clientes").select("*").order("criado_em", { ascending: false });
+    carregando = false;
+    if (error) { toast("Erro ao carregar: " + traduzirErro(error)); return; }
+    registros = data;
+    render();
+    verificarImportacao();
+  }
+
+  // ===== Tabela =====
+  function render() {
+    const termo = $("busca").value.trim().toLowerCase();
+    const termoDig = soDigitos(termo);
+    const mostrarCpf = $("mostrar-cpf").checked;
+
+    let lista = registros.filter((r) => {
+      if (!termo) return true;
+      return [r.nome, r.cidade, r.email].some((v) => (v || "").toLowerCase().includes(termo)) ||
+        (termoDig && (soDigitos(r.cpf).includes(termoDig) || soDigitos(r.telefone).includes(termoDig)));
+    });
+    lista.sort((a, b) => {
+      const x = (a[ordem.campo] || "").toString(), y = (b[ordem.campo] || "").toString();
+      return (ordem.asc ? 1 : -1) * x.localeCompare(y, "pt-BR", { sensitivity: "base" });
+    });
+
+    document.querySelectorAll("th[data-ordem]").forEach((th) => {
+      const ativo = th.dataset.ordem === ordem.campo;
+      th.classList.toggle("ordenado", ativo);
+      th.querySelector(".seta").textContent = ativo ? (ordem.asc ? "↑" : "↓") : "↕";
+    });
+
+    $("linhas").innerHTML = lista.map((r) => `
+      <tr>
+        <td><div class="pessoa"><div class="avatar">${escapar(iniciais(r.nome))}</div><div><strong>${escapar(r.nome)}</strong><span>${escapar(r.email || "Sem e-mail")}</span></div></div></td>
+        <td class="mono">${escapar(mostrarCpf ? r.cpf : cpfOculto(r.cpf))}</td>
+        <td class="mono">${escapar(r.telefone)}</td>
+        <td>${escapar(r.cidade ? r.cidade + (r.uf ? " / " + r.uf : "") : "—")}</td>
+        <td>${dataBR(r.criado_em)}</td>
+        <td><div class="acoes">
+          <button class="btn-icone" data-ver="${r.id}" title="Ver" aria-label="Ver detalhes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button class="btn-icone" data-editar="${r.id}" title="Editar" aria-label="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+          <button class="btn-icone excluir" data-excluir="${r.id}" title="Excluir" aria-label="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+        </div></td>
+      </tr>`).join("");
+
+    const vazio = $("vazio");
+    vazio.hidden = lista.length > 0;
+    document.querySelector("table").style.display = lista.length ? "" : "none";
+    if (!lista.length) {
+      vazio.innerHTML = carregando
+        ? `<h3>Carregando cadastros...</h3>`
+        : registros.length
+        ? `<div class="vazio-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><h3>Nada encontrado</h3><p>Nenhum cadastro corresponde a "${escapar($("busca").value)}".</p>`
+        : `<div class="vazio-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></div><h3>Nenhum cadastro ainda</h3><p>Adicione o primeiro cliente para começar.</p><button class="btn btn-primaria" data-novo>Novo cadastro</button>`;
+    }
+    $("contagem").textContent = termo ? `${lista.length} de ${registros.length}` : `${registros.length} cadastro${registros.length === 1 ? "" : "s"}`;
+
+    // Estatísticas
+    const agora = new Date();
+    $("e-total").textContent = registros.length;
+    $("e-mes").textContent = registros.filter((r) => { const d = new Date(r.criado_em); return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear(); }).length;
+    const ultimo = [...registros].sort((a, b) => b.criado_em.localeCompare(a.criado_em))[0];
+    $("e-ultimo").textContent = ultimo ? ultimo.nome.split(" ")[0] + " · " + dataBR(ultimo.criado_em) : "—";
+  }
+  $("vazio").addEventListener("click", (e) => { if (e.target.closest("[data-novo]")) abrirForm(); });
+
+  $("busca").addEventListener("input", render);
+  $("mostrar-cpf").addEventListener("change", render);
+  document.querySelectorAll("th[data-ordem]").forEach((th) => th.addEventListener("click", () => {
+    ordem = { campo: th.dataset.ordem, asc: ordem.campo === th.dataset.ordem ? !ordem.asc : true };
+    render();
+  }));
+  $("linhas").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.ver) abrirVer(b.dataset.ver);
+    if (b.dataset.editar) abrirForm(b.dataset.editar);
+    if (b.dataset.excluir) abrirExcluir(b.dataset.excluir);
+  });
+
+  // ===== Modais =====
+  const abrir = (id) => { $(id).classList.add("aberto"); document.body.style.overflow = "hidden"; };
+  const fechar = (el) => { el.classList.remove("aberto"); if (!document.querySelector(".modal-fundo.aberto")) document.body.style.overflow = ""; };
+  document.querySelectorAll(".modal-fundo").forEach((m) => {
+    m.addEventListener("mousedown", (e) => { if (e.target === m) fechar(m); });
+    m.querySelectorAll("[data-fechar]").forEach((b) => (b.onclick = () => fechar(m)));
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".modal-fundo.aberto").forEach(fechar); });
+
+  // ===== Formulário =====
+  const CAMPOS = ["nome", "cpf", "nascimento", "telefone", "email", "cep", "rua", "numero", "bairro", "cidade", "uf", "obs"];
+  aplicarMascara($("f-cpf"), "cpf");
+  aplicarMascara($("f-telefone"), "telefone");
+  aplicarMascara($("f-cep"), "cep");
+
+  function abrirForm(id = null) {
+    editandoId = id;
+    const r = id ? registros.find((x) => x.id === id) : {};
+    CAMPOS.forEach((c) => ($("f-" + c).value = r[c] || ""));
+    document.querySelectorAll("#form .campo").forEach((c) => c.classList.remove("invalido"));
+    $("form-alerta").className = "alerta";
+    $("form-titulo").textContent = id ? "Editar cadastro" : "Novo cadastro";
+    $("salvar").textContent = id ? "Salvar alterações" : "Salvar cadastro";
+    abrir("modal-form");
+    setTimeout(() => $("f-nome").focus(), 50);
+  }
+  $("novo").onclick = () => abrirForm();
+  $("menu-novo").onclick = (e) => { e.preventDefault(); $("lateral").classList.remove("aberta"); abrirForm(); };
+
+  // Busca do endereço pelo CEP (ViaCEP)
+  $("f-cep").addEventListener("input", async () => {
+    const cep = soDigitos($("f-cep").value);
+    marcarCampo($("f-cep"), true);
+    if (cep.length !== 8) return;
+    try {
+      const resp = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const d = await resp.json();
+      if (d.erro) return marcarCampo($("f-cep"), false, "CEP não encontrado.");
+      $("f-rua").value = d.logradouro || $("f-rua").value;
+      $("f-bairro").value = d.bairro || $("f-bairro").value;
+      $("f-cidade").value = d.localidade || "";
+      $("f-uf").value = d.uf || "";
+      $("f-numero").focus();
+    } catch {
+      marcarCampo($("f-cep"), false, "Sem internet para buscar o CEP. Preencha à mão.");
+    }
+  });
+
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const v = (c) => $("f-" + c).value.trim();
+    const telDig = soDigitos(v("telefone"));
+    const hoje = new Date().toISOString().slice(0, 10);
+
+    let cpfOk = cpfValido(v("cpf"));
+    let cpfMsg = "CPF inválido. Confira os números.";
+    if (cpfOk && registros.some((r) => soDigitos(r.cpf) === soDigitos(v("cpf")) && r.id !== editandoId)) {
+      cpfOk = false; cpfMsg = "Este CPF já está cadastrado.";
+    }
+    const ok = [
+      marcarCampo($("f-nome"), v("nome").split(/\s+/).length >= 2 || v("nome").length >= 3),
+      marcarCampo($("f-cpf"), cpfOk, cpfMsg),
+      marcarCampo($("f-nascimento"), !v("nascimento") || (v("nascimento") <= hoje && v("nascimento") >= "1900-01-01")),
+      marcarCampo($("f-telefone"), telDig.length === 10 || telDig.length === 11),
+      marcarCampo($("f-email"), !v("email") || emailValido(v("email"))),
+    ].every(Boolean);
+    if (!ok) {
+      $("form-alerta").textContent = "Corrija os campos marcados em vermelho.";
+      $("form-alerta").className = "alerta mostrar";
+      document.querySelector("#form .campo.invalido input")?.focus();
+      return;
+    }
+
+    const dados = {};
+    CAMPOS.forEach((c) => (dados[c] = v(c)));
+    dados.uf = dados.uf.toUpperCase();
+    dados.nascimento = dados.nascimento || null;
+
+    const botao = $("salvar"), textoBotao = botao.textContent;
+    botao.disabled = true; botao.textContent = "Salvando...";
+    const consulta = editandoId
+      ? sb.from("clientes").update({ ...dados, atualizado_em: new Date().toISOString() }).eq("id", editandoId)
+      : sb.from("clientes").insert(dados);
+    const { data, error } = await consulta.select().single();
+    botao.disabled = false; botao.textContent = textoBotao;
+
+    if (error) {
+      if (error.code === "23505") marcarCampo($("f-cpf"), false, "Este CPF já está cadastrado.");
+      $("form-alerta").textContent = "Não foi possível salvar: " + traduzirErro(error);
+      $("form-alerta").className = "alerta mostrar";
+      return;
+    }
+    if (editandoId) {
+      registros = registros.map((r) => (r.id === editandoId ? data : r));
+      toast("Cadastro atualizado.");
+    } else {
+      registros.unshift(data);
+      toast("Cadastro salvo.");
+    }
+    fechar($("modal-form"));
+    render();
+  });
+
+  // ===== Ver detalhes =====
+  function abrirVer(id) {
+    vendoId = id;
+    const r = registros.find((x) => x.id === id);
+    const endereco = [r.rua && r.rua + (r.numero ? ", " + r.numero : ""), r.bairro, r.cidade && r.cidade + (r.uf ? " / " + r.uf : ""), r.cep].filter(Boolean).join(" · ");
+    const itens = [
+      ["Nome", r.nome], ["CPF", r.cpf], ["Nascimento", nascBR(r.nascimento)], ["Telefone", r.telefone],
+      ["E-mail", r.email || "—"], ["Endereço", endereco || "—"], ["Observações", r.obs || "—"],
+      ["Cadastrado em", dataBR(r.criado_em)], ...(r.atualizado_em ? [["Atualizado em", dataBR(r.atualizado_em)]] : []),
+    ];
+    $("ver-titulo").textContent = r.nome;
+    $("ver-corpo").innerHTML = itens.map(([k, val]) => `<dt>${k}</dt><dd>${escapar(val)}</dd>`).join("");
+    abrir("modal-ver");
+  }
+  $("ver-editar").onclick = () => { fechar($("modal-ver")); abrirForm(vendoId); };
+
+  // ===== Excluir =====
+  function abrirExcluir(id) {
+    excluindoId = id;
+    $("excluir-nome").textContent = registros.find((x) => x.id === id).nome;
+    abrir("modal-excluir");
+  }
+  $("confirmar-excluir").onclick = async () => {
+    const botao = $("confirmar-excluir");
+    botao.disabled = true;
+    const { error } = await sb.from("clientes").delete().eq("id", excluindoId);
+    botao.disabled = false;
+    if (error) { toast("Não foi possível excluir: " + traduzirErro(error)); return; }
+    registros = registros.filter((x) => x.id !== excluindoId);
+    fechar($("modal-excluir"));
+    render();
+    toast("Cadastro excluído.");
+  };
+
+  // ===== Exportar para planilha (abre no Excel) =====
+  function exportar() {
+    if (!registros.length) return toast("Não há cadastros para exportar.");
+    const cab = ["Nome", "CPF", "Nascimento", "Telefone", "E-mail", "CEP", "Rua", "Número", "Bairro", "Cidade", "UF", "Observações", "Cadastrado em"];
+    const cel = (t) => {
+      t = String(t ?? "");
+      if (/^[=+\-@]/.test(t)) t = "'" + t; // evita fórmulas maliciosas no Excel
+      return `"${t.replace(/"/g, '""')}"`;
+    };
+    const linhas = registros.map((r) => [r.nome, r.cpf, nascBR(r.nascimento), r.telefone, r.email, r.cep, r.rua, r.numero, r.bairro, r.cidade, r.uf, r.obs, dataBR(r.criado_em)].map(cel).join(";"));
+    const csv = "﻿" + [cab.map(cel).join(";"), ...linhas].join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = `cadastros-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("Planilha exportada.");
+  }
+  $("exportar").onclick = exportar;
+  $("menu-exportar").onclick = (e) => { e.preventDefault(); $("lateral").classList.remove("aberta"); exportar(); };
+
+  // ===== Importar cadastros da versão antiga (salvos só no navegador) =====
+  function cadastrosLocais() {
+    const lista = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const chave = localStorage.key(i);
+      if (!chave.startsWith("cad_registros_")) continue;
+      try { lista.push(...JSON.parse(localStorage.getItem(chave))); } catch {}
+    }
+    const jaExiste = new Set(registros.map((r) => soDigitos(r.cpf)));
+    const vistos = new Set();
+    return lista.filter((r) => {
+      const d = soDigitos(r.cpf);
+      if (!r.nome || !d || jaExiste.has(d) || vistos.has(d)) return false;
+      vistos.add(d);
+      return true;
+    });
+  }
+  function verificarImportacao() {
+    if (localStorage.getItem("cad_importacao_ignorada")) return;
+    const n = cadastrosLocais().length;
+    $("importar-qtd").textContent = n;
+    $("importar-aviso").classList.toggle("mostrar", n > 0);
+  }
+  $("importar-depois").onclick = () => {
+    localStorage.setItem("cad_importacao_ignorada", "1");
+    $("importar-aviso").classList.remove("mostrar");
+  };
+  $("importar-sim").onclick = async () => {
+    const botao = $("importar-sim");
+    botao.disabled = true; botao.textContent = "Importando...";
+    const linhas = cadastrosLocais().map((r) => ({
+      nome: r.nome, cpf: Mascara.cpf(r.cpf), nascimento: r.nascimento || null, telefone: r.telefone || "",
+      email: r.email || "", cep: r.cep || "", rua: r.rua || "", numero: r.numero || "", bairro: r.bairro || "",
+      cidade: r.cidade || "", uf: r.uf || "", obs: r.obs || "", criado_em: r.criadoEm || new Date().toISOString(),
+    }));
+    const { error } = await sb.from("clientes").insert(linhas);
+    botao.disabled = false; botao.textContent = "Importar";
+    if (error) { toast("Erro ao importar: " + traduzirErro(error)); return; }
+    localStorage.setItem("cad_importacao_ignorada", "1");
+    $("importar-aviso").classList.remove("mostrar");
+    toast(linhas.length + " cadastro(s) importado(s).");
+    carregar();
+  };
+
+  render();
+  carregar();
+})();
+</script>
+</body>
+</html>

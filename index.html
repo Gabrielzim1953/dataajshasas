@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar | Cadastro de Clientes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="auth">
+  <aside class="auth-lado">
+    <a class="logo" href="index.html">
+      <span class="logo-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+      Cadastro de Clientes
+    </a>
+    <div style="position:relative">
+      <h2>Seus cadastros organizados em um só lugar.</h2>
+      <p>Guarde nome, CPF, telefone e endereço dos seus clientes e encontre qualquer um em segundos.</p>
+      <ul class="beneficios">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Validação automática de CPF</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Endereço preenchido pelo CEP</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Busca rápida e exportação para Excel</li>
+      </ul>
+    </div>
+    <small>© <span class="ano"></span> Cadastro de Clientes</small>
+  </aside>
+
+  <main class="auth-form">
+    <div class="auth-caixa">
+      <h1>Entrar</h1>
+      <p>Bem-vindo de volta. Acesse sua conta.</p>
+
+      <form id="form" novalidate>
+        <div class="alerta" id="alerta"></div>
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+          <span class="msg-erro">Informe um e-mail válido.</span>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <div class="entrada">
+            <input id="senha" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+            <button type="button" class="ver-senha" aria-label="Mostrar senha"></button>
+          </div>
+          <span class="msg-erro">Informe sua senha.</span>
+        </div>
+
+        <button class="btn btn-primaria btn-bloco" type="submit" id="botao">Entrar</button>
+      </form>
+
+      <p class="troca">Ainda não tem conta? <a href="cadastro.html">Criar conta</a></p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+  Auth.atual().then((u) => { if (u) location.replace("painel.html"); });
+  document.querySelectorAll(".ano").forEach((e) => (e.textContent = new Date().getFullYear()));
+  document.querySelectorAll(".ver-senha").forEach((b) => (b.innerHTML = ICONES.olho));
+  ativarVerSenha();
+
+  const params = new URLSearchParams(location.search);
+  const alerta = document.getElementById("alerta");
+  if (params.get("criada")) {
+    alerta.textContent = "Conta criada com sucesso! Agora é só entrar.";
+    alerta.className = "alerta ok mostrar";
+    document.getElementById("email").value = params.get("email") || "";
+  }
+
+  document.getElementById("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email"), senha = document.getElementById("senha");
+    const ok = [marcarCampo(email, emailValido(email.value)), marcarCampo(senha, senha.value.length > 0)].every(Boolean);
+    if (!ok) return;
+    const botao = document.getElementById("botao");
+    botao.disabled = true; botao.textContent = "Entrando...";
+    try {
+      await Auth.entrar(email.value, senha.value);
+      location.href = "painel.html";
+    } catch (err) {
+      alerta.textContent = err.message;
+      alerta.className = "alerta mostrar";
+      botao.disabled = false; botao.textContent = "Entrar";
+    }
+  });
+</script>
+</body>
+</html>

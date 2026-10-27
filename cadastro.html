@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criar conta | Cadastro de Clientes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="auth">
+  <aside class="auth-lado">
+    <a class="logo" href="index.html">
+      <span class="logo-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+      Cadastro de Clientes
+    </a>
+    <div style="position:relative">
+      <h2>Crie sua conta e comece a cadastrar.</h2>
+      <p>Leva menos de um minuto. Cada conta tem a sua própria lista de clientes.</p>
+      <ul class="beneficios">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Senha protegida com criptografia</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>CPF escondido na listagem</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Funciona no computador e no celular</li>
+      </ul>
+    </div>
+    <small>© <span class="ano"></span> Cadastro de Clientes</small>
+  </aside>
+
+  <main class="auth-form">
+    <div class="auth-caixa">
+      <h1>Criar conta</h1>
+      <p>Preencha seus dados para começar.</p>
+
+      <form id="form" novalidate>
+        <div class="alerta" id="alerta"></div>
+
+        <div class="campo">
+          <label for="nome">Nome completo</label>
+          <input id="nome" autocomplete="name" placeholder="Seu nome" required>
+          <span class="msg-erro">Informe seu nome.</span>
+        </div>
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+          <span class="msg-erro">Informe um e-mail válido.</span>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <div class="entrada">
+            <input id="senha" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" required>
+            <button type="button" class="ver-senha" aria-label="Mostrar senha"></button>
+          </div>
+          <div class="forca"><div id="forca-barra"></div></div>
+          <span class="forca-texto" id="forca-texto">Use letras, números e símbolos.</span>
+          <span class="msg-erro">A senha precisa ter pelo menos 8 caracteres.</span>
+        </div>
+
+        <div class="campo">
+          <label for="confirmar">Confirmar senha</label>
+          <div class="entrada">
+            <input id="confirmar" type="password" autocomplete="new-password" placeholder="Repita a senha" required>
+            <button type="button" class="ver-senha" aria-label="Mostrar senha"></button>
+          </div>
+          <span class="msg-erro">As senhas não são iguais.</span>
+        </div>
+
+        <label class="check"><input type="checkbox" id="termos"> Concordo em usar os dados cadastrados de acordo com a LGPD.</label>
+
+        <button class="btn btn-primaria btn-bloco" type="submit" id="botao">Criar conta</button>
+      </form>
+
+      <p class="troca">Já tem conta? <a href="index.html">Entrar</a></p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+  Auth.atual().then((u) => { if (u) location.replace("painel.html"); });
+  document.querySelectorAll(".ano").forEach((e) => (e.textContent = new Date().getFullYear()));
+  document.querySelectorAll(".ver-senha").forEach((b) => (b.innerHTML = ICONES.olho));
+  ativarVerSenha();
+
+  const $ = (id) => document.getElementById(id);
+  const alerta = $("alerta");
+
+  // Medidor de força da senha
+  $("senha").addEventListener("input", () => {
+    const s = $("senha").value;
+    let pontos = 0;
+    if (s.length >= 8) pontos++;
+    if (s.length >= 12) pontos++;
+    if (/[a-z]/.test(s) && /[A-Z]/.test(s)) pontos++;
+    if (/\d/.test(s)) pontos++;
+    if (/[^A-Za-z0-9]/.test(s)) pontos++;
+    const niveis = [["Muito fraca", "#dc2626"], ["Fraca", "#f97316"], ["Razoável", "#eab308"], ["Boa", "#22c55e"], ["Forte", "#16a34a"], ["Muito forte", "#15803d"]];
+    const [rotulo, cor] = niveis[pontos];
+    $("forca-barra").style.width = s ? (pontos + 1) * (100 / 6) + "%" : "0";
+    $("forca-barra").style.background = cor;
+    $("forca-texto").textContent = s ? "Força: " + rotulo : "Use letras, números e símbolos.";
+  });
+
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    alerta.className = "alerta";
+    const ok = [
+      marcarCampo($("nome"), $("nome").value.trim().length >= 3),
+      marcarCampo($("email"), emailValido($("email").value)),
+      marcarCampo($("senha"), $("senha").value.length >= 8),
+      marcarCampo($("confirmar"), $("confirmar").value === $("senha").value && $("confirmar").value.length > 0),
+    ].every(Boolean);
+    if (!ok) return;
+    if (!$("termos").checked) {
+      alerta.textContent = "Marque a caixa de concordância para continuar.";
+      alerta.className = "alerta mostrar";
+      return;
+    }
+    const botao = $("botao");
+    botao.disabled = true; botao.textContent = "Criando conta...";
+    try {
+      const { precisaConfirmar } = await Auth.cadastrar({ nome: $("nome").value, email: $("email").value, senha: $("senha").value });
+      if (!precisaConfirmar) { location.href = "painel.html"; return; }
+      alerta.textContent = `Conta criada! Enviamos um link de confirmação para ${$("email").value.trim()}. Clique nele (veja também o spam) e depois entre com seu e-mail e senha.`;
+      alerta.className = "alerta ok mostrar";
+      $("form").querySelectorAll("input, button").forEach((el) => (el.disabled = true));
+      botao.textContent = "Conta criada";
+    } catch (err) {
+      alerta.textContent = err.message;
+      alerta.className = "alerta mostrar";
+      botao.disabled = false; botao.textContent = "Criar conta";
+    }
+  });
+</script>
+</body>
+</html>
